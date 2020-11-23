@@ -13,7 +13,8 @@ public class Trello {
 
     // key 3b39b1ad0a0cc225980e65253a228d35
     // token 0d0f0cbebb3e927766533634decaa9331c6acdf563d018f1831d77146890db52
-    // id 5fba648cd60d9550a772875b
+    // idList1 5fbc2855a67b4a603deff54f
+    // idList2 5fbc31d82b29677b7cde66b8 ApiList
 
     @Test
     public void information () {
@@ -31,29 +32,24 @@ public class Trello {
         System.out.println("Status line is " + statusLine);
         Assert.assertEquals(statusLine, "HTTP/1.1 200 OK");
     }
-    // Сверху все работает ОК, отображает валидную информацию.
-    // Ошибка: could not find the board that the card belongs to
     @Test
     public void createCardForApi ()  {
-        RestAssured.baseURI = "https://api.trello.com/1/cards";
+        RestAssured.baseURI = "https://api.trello.com";
         RequestSpecification httpRequest = RestAssured.given();
 
         JSONObject requestParams = new JSONObject();
-        requestParams.put("key", "3b39b1ad0a0cc225980e65253a228d35");
-        requestParams.put("token", "0d0f0cbebb3e927766533634decaa9331c6acdf563d018f1831d77146890db52");
-        requestParams.put("idList", "5fba648cd60d9550a772875b");
-        requestParams.put("name", "CardForApi");
-        httpRequest.header("CardForApi", "application/json");
+        httpRequest.queryParam("key", "3b39b1ad0a0cc225980e65253a228d35");
+        httpRequest.queryParam("token", "0d0f0cbebb3e927766533634decaa9331c6acdf563d018f1831d77146890db52");
+        httpRequest.queryParam("idList", "5fbc2855a67b4a603deff54f");
+        httpRequest.queryParam("name", "CardForApi");
         httpRequest.body(requestParams.toJSONString());
 
-        Response response = httpRequest.request(Method.POST,"?key=3b39b1ad0a0cc225980e65253a228d35&0d0f0cbebb3e927766533634decaa9331c6acdf563d018f1831d77146890db52&idList=5fba648cd60d9550a772875b");
+        Response response = httpRequest.request(Method.POST,"/1/cards");
 
         String responseBody = response.getBody().asString();
         System.out.println("Response body is: " + responseBody);
-
-
         }
-        // Ошибка: could not find the board that the card belongs to
+
     @Test
     public void createCardForDelete ()  {
         RestAssured.baseURI = "https://api.trello.com";
@@ -62,7 +58,7 @@ public class Trello {
         JSONObject requestParams = new JSONObject();
         httpRequest.queryParam("key", "3b39b1ad0a0cc225980e65253a228d35");
         httpRequest.queryParam("token", "0d0f0cbebb3e927766533634decaa9331c6acdf563d018f1831d77146890db52");
-        httpRequest.queryParam("idList", "5fba648cd60d9550a772875b");
+        httpRequest.queryParam("idList", "5fbc2855a67b4a603deff54f");
         httpRequest.queryParam("name", "CardForDelete");
         httpRequest.body(requestParams.toJSONString());
 
@@ -72,17 +68,69 @@ public class Trello {
         System.out.println("Response body is: " + responseBody);
 
     }
-    //Решил попробовать через UniRest, как написано в руководстве Trello. Ошибка: could not find the board that the card belongs to
+    //Решил попробовать через UniRest, как прописано в руководстве Trello.
     @Test
     public void createCardForApiUniRest() throws UnirestException {
         HttpResponse<String> response = Unirest.post("https://api.trello.com/1/cards")
                 .queryString("key", "3b39b1ad0a0cc225980e65253a228d35")
                 .queryString("token", "0d0f0cbebb3e927766533634decaa9331c6acdf563d018f1831d77146890db52")
-                .queryString("idList","5fba648cd60d9550a772875b")
+                .queryString("idList","5fbc2855a67b4a603deff54f")
                 .queryString("name", "CardForApi")
                 .asString();
         System.out.println(response.getBody());
 
+    }
+    @Test
+    public void editCardForApi ()  {
+        RestAssured.baseURI = "https://api.trello.com";
+        RequestSpecification httpRequest = RestAssured.given();
+
+        JSONObject requestParams = new JSONObject();
+        httpRequest.queryParam("key", "3b39b1ad0a0cc225980e65253a228d35");
+        httpRequest.queryParam("token", "0d0f0cbebb3e927766533634decaa9331c6acdf563d018f1831d77146890db52");
+        httpRequest.queryParam("desc", "Описание карточки через rest-Api");
+        httpRequest.body(requestParams.toJSONString());
+
+        Response response = httpRequest.request(Method.PUT,"/1/cards/5fbc2bbd1a7d3c4db79e06cc");
+
+        String responseBody = response.getBody().asString();
+        System.out.println("Response body is: " + responseBody);
+
+    }
+    @Test
+    public void createApiList ()  {
+        RestAssured.baseURI = "https://api.trello.com";
+        RequestSpecification httpRequest = RestAssured.given();
+
+        JSONObject requestParams = new JSONObject();
+        httpRequest.queryParam("key", "3b39b1ad0a0cc225980e65253a228d35");
+        httpRequest.queryParam("token", "0d0f0cbebb3e927766533634decaa9331c6acdf563d018f1831d77146890db52");
+        httpRequest.queryParam("idBoard", "5fba648cd60d9550a772875b");
+        httpRequest.queryParam("name", "ApiList");
+        httpRequest.body(requestParams.toJSONString());
+
+        Response response = httpRequest.request(Method.POST,"/1/lists/");
+
+        String responseBody = response.getBody().asString();
+        System.out.println("Response body is: " + responseBody);
+    }
+
+    @Test
+    public void moveCardToApiList ()  {
+        RestAssured.baseURI = "https://api.trello.com";
+        RequestSpecification httpRequest = RestAssured.given();
+
+        JSONObject requestParams = new JSONObject();
+        httpRequest.queryParam("key", "3b39b1ad0a0cc225980e65253a228d35");
+        httpRequest.queryParam("token", "0d0f0cbebb3e927766533634decaa9331c6acdf563d018f1831d77146890db52");
+        httpRequest.queryParam("idBoard", "5fba648cd60d9550a772875b");
+        httpRequest.queryParam("idList", "5fbc31d82b29677b7cde66b8");
+        httpRequest.body(requestParams.toJSONString());
+
+        Response response = httpRequest.request(Method.POST,"/1/lists/5fbc2855a67b4a603deff54f/moveCard");
+
+        String responseBody = response.getBody().asString();
+        System.out.println("Response body is: " + responseBody);
     }
 
 
