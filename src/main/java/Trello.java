@@ -11,10 +11,12 @@ import org.testng.Assert;
 
 public class Trello {
 
-    // key 3b39b1ad0a0cc225980e65253a228d35
-    // token 0d0f0cbebb3e927766533634decaa9331c6acdf563d018f1831d77146890db52
-    // idList1 5fbc2855a67b4a603deff54f
+    // key     3b39b1ad0a0cc225980e65253a228d35
+    // token   0d0f0cbebb3e927766533634decaa9331c6acdf563d018f1831d77146890db52
+    // idBoard 5fba648cd60d9550a772875b htapikim
+    // idList1 5fbc2855a67b4a603deff54f FirstList
     // idList2 5fbc31d82b29677b7cde66b8 ApiList
+    // idCard  5fbc2bc750e838780f5c6f30 CardForDelete
 
     @Test
     public void information () {
@@ -32,6 +34,24 @@ public class Trello {
         System.out.println("Status line is " + statusLine);
         Assert.assertEquals(statusLine, "HTTP/1.1 200 OK");
     }
+
+    @Test
+    public void createFirstList ()  {
+        RestAssured.baseURI = "https://api.trello.com";
+        RequestSpecification httpRequest = RestAssured.given();
+
+        JSONObject requestParams = new JSONObject();
+        httpRequest.queryParam("key", "3b39b1ad0a0cc225980e65253a228d35");
+        httpRequest.queryParam("token", "0d0f0cbebb3e927766533634decaa9331c6acdf563d018f1831d77146890db52");
+        httpRequest.queryParam("idBoard", "5fba648cd60d9550a772875b");
+        httpRequest.queryParam("name", "FirstList");
+        httpRequest.body(requestParams.toJSONString());
+
+        Response response = httpRequest.request(Method.POST,"/1/lists");
+
+        String responseBody = response.getBody().asString();
+        System.out.println("Response body is: " + responseBody);
+        }
     @Test
     public void createCardForApi ()  {
         RestAssured.baseURI = "https://api.trello.com";
@@ -116,7 +136,8 @@ public class Trello {
     }
 
     @Test
-    public void moveCardToApiList ()  {
+    // move CardForApi from FirstList to ApiList
+    public void moveToApiList ()  {
         RestAssured.baseURI = "https://api.trello.com";
         RequestSpecification httpRequest = RestAssured.given();
 
@@ -127,12 +148,26 @@ public class Trello {
         httpRequest.queryParam("idList", "5fbc31d82b29677b7cde66b8");
         httpRequest.body(requestParams.toJSONString());
 
-        Response response = httpRequest.request(Method.POST,"/1/lists/5fbc2855a67b4a603deff54f/moveCard");
+        Response response = httpRequest.request(Method.POST,"/1/lists/5fbc2855a67b4a603deff54f/moveAllCards");
+
+        String responseBody = response.getBody().asString();
+        System.out.println("Response body is: " + responseBody);
+    }
+    @Test
+    public void deleteCardForDelete ()  {
+        RestAssured.baseURI = "https://api.trello.com";
+        RequestSpecification httpRequest = RestAssured.given();
+
+        JSONObject requestParams = new JSONObject();
+        httpRequest.queryParam("key", "3b39b1ad0a0cc225980e65253a228d35");
+        httpRequest.queryParam("token", "0d0f0cbebb3e927766533634decaa9331c6acdf563d018f1831d77146890db52");
+        httpRequest.body(requestParams.toJSONString());
+
+        Response response = httpRequest.request(Method.DELETE,"/1/cards/5fbc2bc750e838780f5c6f30");
 
         String responseBody = response.getBody().asString();
         System.out.println("Response body is: " + responseBody);
     }
 
-
-    }
+}
 
